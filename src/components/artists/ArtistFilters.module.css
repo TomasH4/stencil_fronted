@@ -1,0 +1,29 @@
+.filtersForm {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  background-color: white;
+  padding: 1.5rem;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  margin-bottom: 2rem;
+}
+
+@media (min-width: 768px) {
+  .filtersForm {
+    grid-template-columns: repeat(4, 1fr);
+    align-items: flex-end;
+  }
+}
+
+.priceGroup {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+}
+
+.actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem; /* aligns with inputs assuming they have margin-bottom */
+}

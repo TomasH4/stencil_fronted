@@ -1,0 +1,28 @@
+.container {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-5);
+  background: var(--color-danger-bg);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: var(--radius-lg);
+  animation: slideIn 0.2s ease;
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.icon {
+  flex-shrink: 0;
+  font-size: var(--font-size-md);
+  line-height: 1.5;
+}
+
+.text {
+  font-size: var(--font-size-sm);
+  color: var(--color-danger);
+  font-weight: 500;
+  line-height: 1.5;
+}
