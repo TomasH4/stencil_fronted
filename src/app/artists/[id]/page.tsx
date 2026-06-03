@@ -142,7 +142,7 @@ export default function ArtistDetailPage() {
                   }}>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img 
-                      src={`${(process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api/v1').replace('/api/v1', '')}${img.imageUrl}`} 
+                      src={img.imageUrl} 
                       alt={img.description || 'Portfolio item'} 
                       style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.3s ease' }}
                     />

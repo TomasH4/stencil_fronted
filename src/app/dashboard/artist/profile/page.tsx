@@ -202,7 +202,7 @@ export default function ArtistProfilePage() {
                     {profile.portfolioImages.map(img => (
                       <div key={img.id} className={styles.portfolioItem}>
                         {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src={`${(process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api/v1').replace('/api/v1', '')}${img.imageUrl}`} alt={img.description || 'Portfolio item'} />
+                        <img src={img.imageUrl} alt={img.description || 'Portfolio item'} />
                         <button 
                           className={styles.deleteImageBtn} 
                           onClick={() => handleDeleteImage(img.id)}
