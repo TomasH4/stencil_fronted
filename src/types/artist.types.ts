@@ -1,5 +1,12 @@
 import { AuthUser } from './auth.types';
 
+export interface PortfolioImage {
+  id: string;
+  imageUrl: string;
+  description?: string;
+  createdAt: string;
+}
+
 export interface TattooArtistProfile {
   id: string;
   userId: string;
@@ -9,6 +16,7 @@ export interface TattooArtistProfile {
   location: string;
   priceMin: number;
   priceMax: number;
+  portfolioImages?: PortfolioImage[];
   createdAt: string;
   updatedAt: string;
   user?: AuthUser; // Usually populated by backend for profile with user info

@@ -122,6 +122,51 @@ export default function ArtistDetailPage() {
             </div>
           )}
 
+          {/* Portfolio */}
+          {profile.portfolioImages && profile.portfolioImages.length > 0 && (
+            <div className={styles.portfolioSection} style={{ marginTop: 'var(--space-6)' }}>
+              <h2 className={styles.sectionTitle}>Portafolio</h2>
+              <div style={{ 
+                display: 'grid', 
+                gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', 
+                gap: 'var(--space-4)', 
+                marginTop: 'var(--space-4)' 
+              }}>
+                {profile.portfolioImages.map(img => (
+                  <div key={img.id} style={{ 
+                    position: 'relative', 
+                    aspectRatio: '1', 
+                    borderRadius: 'var(--radius-lg)', 
+                    overflow: 'hidden', 
+                    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                  }}>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img 
+                      src={`${(process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api/v1').replace('/api/v1', '')}${img.imageUrl}`} 
+                      alt={img.description || 'Portfolio item'} 
+                      style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.3s ease' }}
+                    />
+                    {img.description && (
+                      <div style={{
+                        position: 'absolute',
+                        bottom: 0,
+                        left: 0,
+                        right: 0,
+                        background: 'linear-gradient(transparent, rgba(0,0,0,0.8))',
+                        color: 'white',
+                        padding: 'var(--space-4) var(--space-3) var(--space-2)',
+                        fontSize: 'var(--font-size-sm)',
+                        textShadow: '0 1px 2px rgba(0,0,0,0.8)'
+                      }}>
+                        {img.description}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Success message */}
           {successMsg && (
             <div className={styles.successAlert}>

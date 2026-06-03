@@ -18,6 +18,11 @@ export const artistService = {
     return data.data;
   },
 
+  getMyProfile: async (): Promise<TattooArtistProfile> => {
+    const { data } = await api.get<{data: TattooArtistProfile}>('/artists/me');
+    return data.data;
+  },
+
   createProfile: async (dto: CreateArtistProfileDto): Promise<TattooArtistProfile> => {
     const { data } = await api.post<{data: TattooArtistProfile}>('/artists', dto);
     return data.data;
@@ -30,5 +35,18 @@ export const artistService = {
 
   deleteProfile: async (id: string): Promise<void> => {
     await api.delete(`/artists/${id}`);
+  },
+
+  addPortfolioImage: async (artistId: string, formData: FormData): Promise<any> => {
+    const { data } = await api.post(`/artists/${artistId}/portfolio`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return data.data;
+  },
+
+  removePortfolioImage: async (artistId: string, imageId: string): Promise<void> => {
+    await api.delete(`/artists/${artistId}/portfolio/${imageId}`);
   }
 };

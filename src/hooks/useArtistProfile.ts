@@ -21,6 +21,20 @@ export const useArtistProfile = () => {
     }
   }, []);
 
+  const fetchMyProfile = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await artistService.getMyProfile();
+      setProfile(data);
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { error?: { message?: string }, message?: string } }; message?: string };
+      setError(error.response?.data?.error?.message || error.response?.data?.message || error.message || 'Error fetching profile');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   const createProfile = useCallback(async (dto: CreateArtistProfileDto) => {
     setLoading(true);
     setError(null);
@@ -68,5 +82,42 @@ export const useArtistProfile = () => {
     }
   }, []);
 
-  return { profile, loading, error, fetchProfile, createProfile, updateProfile, deleteProfile };
+  const addPortfolioImage = useCallback(async (artistId: string, formData: FormData) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await artistService.addPortfolioImage(artistId, formData);
+      setProfile(prev => prev ? { 
+        ...prev, 
+        portfolioImages: [...(prev.portfolioImages || []), data] 
+      } : null);
+      return data;
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { error?: { message?: string }, message?: string } }; message?: string };
+      setError(error.response?.data?.error?.message || error.response?.data?.message || error.message || 'Error adding image');
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const removePortfolioImage = useCallback(async (artistId: string, imageId: string) => {
+    setLoading(true);
+    setError(null);
+    try {
+      await artistService.removePortfolioImage(artistId, imageId);
+      setProfile(prev => prev ? { 
+        ...prev, 
+        portfolioImages: (prev.portfolioImages || []).filter(img => img.id !== imageId) 
+      } : null);
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { error?: { message?: string }, message?: string } }; message?: string };
+      setError(error.response?.data?.error?.message || error.response?.data?.message || error.message || 'Error removing image');
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  return { profile, loading, error, fetchProfile, fetchMyProfile, createProfile, updateProfile, deleteProfile, addPortfolioImage, removePortfolioImage };
 };
