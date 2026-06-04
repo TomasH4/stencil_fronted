@@ -12,7 +12,9 @@ export default function ReviewCard({ review }: ReviewCardProps) {
   return (
     <div className={styles.card}>
       <div className={styles.header}>
-        <h4 className={styles.name}>{review.clientName || 'Usuario'}</h4>
+        <h4 className={styles.name}>
+          {review.clientName || (review.clientEmail ? review.clientEmail.split('@')[0] : 'Usuario')}
+        </h4>
         <div className={styles.stars}>
           {Array.from({ length: 5 }).map((_, i) => (
             <span key={i} className={i < review.rating ? styles.starFilled : styles.starEmpty}>

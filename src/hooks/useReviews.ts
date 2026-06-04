@@ -23,11 +23,14 @@ export const useReviews = () => {
     }
   }, []);
 
-  const submitReview = useCallback(async (dto: CreateReviewDto) => {
+  const submitReview = useCallback(async (dto: CreateReviewDto, userEmail?: string) => {
     setLoading(true);
     setError(null);
     try {
       const data = await reviewService.createReview(dto);
+      if (userEmail) {
+        data.clientEmail = userEmail;
+      }
       setReviews(prev => [data, ...prev]);
       return data;
     } catch (err: unknown) {

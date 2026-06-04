@@ -43,7 +43,7 @@ export default function ArtistDetailPage() {
 
   const handleSubmitReview = async (dto: CreateReviewDto) => {
     try {
-      await submitReview({ ...dto, artistProfileId: id });
+      await submitReview({ ...dto, artistProfileId: id }, user?.email);
       setSuccessMsg('¡Reseña publicada con éxito!');
       setTimeout(() => setSuccessMsg(null), 3000);
     } catch {

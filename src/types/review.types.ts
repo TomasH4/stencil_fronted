@@ -1,7 +1,8 @@
 export interface Review {
   id: string;
   clientId: string;
-  clientName: string; // From the instructions (Review con campo clientName)
+  clientName?: string; // May not be provided by backend
+  clientEmail?: string; // Provided by backend
   artistProfileId: string;
   rating: number;
   comment: string;
