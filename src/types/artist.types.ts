@@ -16,6 +16,9 @@ export interface TattooArtistProfile {
   location: string;
   priceMin: number;
   priceMax: number;
+  profilePictureUrl?: string;
+  whatsappNumber?: string;
+  instagramUrl?: string;
   portfolioImages?: PortfolioImage[];
   createdAt: string;
   updatedAt: string;
@@ -29,6 +32,8 @@ export interface CreateArtistProfileDto {
   location: string;
   priceMin: number;
   priceMax: number;
+  whatsappNumber?: string;
+  instagramUrl?: string;
 }
 
 export type UpdateArtistProfileDto = Partial<CreateArtistProfileDto>;

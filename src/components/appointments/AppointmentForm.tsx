@@ -16,9 +16,10 @@ interface AppointmentFormProps {
   artistProfileId: string;
   onSubmit: (dto: CreateAppointmentDto) => Promise<void>;
   onCancel?: () => void;
+  isLoading?: boolean;
 }
 
-export default function AppointmentForm({ artistProfileId, onSubmit, onCancel }: AppointmentFormProps) {
+export default function AppointmentForm({ artistProfileId, onSubmit, onCancel, isLoading }: AppointmentFormProps) {
   const { register, handleSubmit, formState: { errors, isSubmitting }, reset } = useForm<{ date: string; notes?: string }>({
     resolver: zodResolver(appointmentSchema),
     defaultValues: {
@@ -68,7 +69,7 @@ export default function AppointmentForm({ artistProfileId, onSubmit, onCancel }:
             Cancelar
           </Button>
         )}
-        <Button type="submit" isLoading={isSubmitting}>
+        <Button type="submit" isLoading={isLoading || isSubmitting}>
           Confirmar
         </Button>
       </div>

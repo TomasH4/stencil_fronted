@@ -3,6 +3,9 @@
 import { useEffect, useState } from 'react';
 import PrivateRoute from '@/components/auth/PrivateRoute';
 import { useArtists } from '@/hooks/useArtists';
+import { useFavorites } from '@/hooks/useFavorites';
+import { useAuthContext } from '@/context/AuthContext';
+import { UserRole } from '@/types/auth.types';
 import { GetArtistsParams } from '@/types/artist.types';
 import ArtistCard from '@/components/artists/ArtistCard';
 import ArtistFilters from '@/components/artists/ArtistFilters';
@@ -13,11 +16,16 @@ import Button from '@/components/ui/Button';
 import styles from './page.module.css';
 
 export default function ArtistsPage() {
+  const { user } = useAuthContext();
   const { artists, meta, loading, error, fetchArtists } = useArtists();
+  const { favorites, fetchFavorites, toggleFavorite } = useFavorites();
   const [currentParams, setCurrentParams] = useState<GetArtistsParams>({ page: 1, limit: 9 });
 
   useEffect(() => {
     fetchArtists(currentParams);
+    if (user?.role === UserRole.CLIENT) {
+      fetchFavorites();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -33,10 +41,22 @@ export default function ArtistsPage() {
     fetchArtists(newParams);
   };
 
+  const handleToggleFavorite = async (e: React.MouseEvent, artistId: string) => {
+    e.preventDefault();
+    try {
+      await toggleFavorite(artistId);
+      await fetchFavorites(); // Refresh favorites list
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   const totalPages = Math.ceil(meta.total / meta.limit);
   const currentPage = meta.page;
   const hasNextPage = currentPage < totalPages;
   const hasPrevPage = currentPage > 1;
+
+  const isClient = user?.role === UserRole.CLIENT;
 
   return (
     <PrivateRoute>
@@ -89,9 +109,18 @@ export default function ArtistsPage() {
             {/* Artist grid */}
             {!loading && artists.length > 0 && (
               <div className={styles.grid}>
-                {artists.map((artist) => (
-                  <ArtistCard key={artist.id} artist={artist} />
-                ))}
+                {artists.map((artist) => {
+                  const isFav = favorites.some((f) => f.id === artist.id);
+                  return (
+                    <ArtistCard 
+                      key={artist.id} 
+                      artist={artist} 
+                      isFavorite={isFav}
+                      showFavoriteBtn={isClient}
+                      onToggleFavorite={(e) => handleToggleFavorite(e, artist.id)}
+                    />
+                  );
+                })}
               </div>
             )}
 

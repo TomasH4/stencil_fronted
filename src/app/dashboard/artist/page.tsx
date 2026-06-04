@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import PrivateRoute from '@/components/auth/PrivateRoute';
 import RoleRoute from '@/components/auth/RoleRoute';
 import { useAppointments } from '@/hooks/useAppointments';
@@ -35,9 +35,19 @@ export default function ArtistDashboardPage() {
     await updateStatus(id, { status: AppointmentStatus.CANCELLED });
   };
 
+  const [activeTab, setActiveTab] = useState<'all' | 'pending' | 'confirmed' | 'cancelled'>('all');
+
   const pending = appointments.filter(a => a.status === AppointmentStatus.PENDING);
   const confirmed = appointments.filter(a => a.status === AppointmentStatus.CONFIRMED);
   const cancelled = appointments.filter(a => a.status === AppointmentStatus.CANCELLED);
+
+  const filteredAppointments = appointments.filter(a => {
+    if (activeTab === 'all') return true;
+    if (activeTab === 'pending') return a.status === AppointmentStatus.PENDING;
+    if (activeTab === 'confirmed') return a.status === AppointmentStatus.CONFIRMED;
+    if (activeTab === 'cancelled') return a.status === AppointmentStatus.CANCELLED;
+    return true;
+  });
 
   return (
     <PrivateRoute>
@@ -94,18 +104,45 @@ export default function ArtistDashboardPage() {
               />
             )}
 
-            {/* Pending appointments first */}
-            {!loading && pending.length > 0 && (
+            {/* Tabs Filter */}
+            {!loading && !error && appointments.length > 0 && (
+              <div style={{ display: 'flex', gap: '1rem', borderBottom: '1px solid var(--color-border)', marginBottom: '2rem', marginTop: '1rem' }}>
+                <button 
+                  onClick={() => setActiveTab('all')}
+                  style={{ background: 'none', border: 'none', padding: '1rem', cursor: 'pointer', borderBottom: activeTab === 'all' ? '2px solid var(--color-accent)' : 'none', fontWeight: activeTab === 'all' ? 'bold' : 'normal' }}
+                >
+                  Todas
+                </button>
+                <button 
+                  onClick={() => setActiveTab('pending')}
+                  style={{ background: 'none', border: 'none', padding: '1rem', cursor: 'pointer', borderBottom: activeTab === 'pending' ? '2px solid var(--color-warning)' : 'none', fontWeight: activeTab === 'pending' ? 'bold' : 'normal', color: 'var(--color-warning)' }}
+                >
+                  Pendientes ({pending.length})
+                </button>
+                <button 
+                  onClick={() => setActiveTab('confirmed')}
+                  style={{ background: 'none', border: 'none', padding: '1rem', cursor: 'pointer', borderBottom: activeTab === 'confirmed' ? '2px solid var(--color-success)' : 'none', fontWeight: activeTab === 'confirmed' ? 'bold' : 'normal', color: 'var(--color-success)' }}
+                >
+                  Confirmadas ({confirmed.length})
+                </button>
+                <button 
+                  onClick={() => setActiveTab('cancelled')}
+                  style={{ background: 'none', border: 'none', padding: '1rem', cursor: 'pointer', borderBottom: activeTab === 'cancelled' ? '2px solid var(--color-danger)' : 'none', fontWeight: activeTab === 'cancelled' ? 'bold' : 'normal', color: 'var(--color-danger)' }}
+                >
+                  Canceladas ({cancelled.length})
+                </button>
+              </div>
+            )}
+
+            {/* Filtered appointments list */}
+            {!loading && filteredAppointments.length > 0 && (
               <div className={styles.section}>
-                <h2 className={styles.sectionTitle}>
-                  <span className={styles.pendingDot} /> Pendientes de confirmación
-                </h2>
                 <div className={styles.appointmentsList}>
-                  {pending.map((appointment) => (
+                  {filteredAppointments.map((appointment) => (
                     <AppointmentCard
                       key={appointment.id}
                       appointment={appointment}
-                      showActions
+                      showActions={appointment.status !== AppointmentStatus.CANCELLED}
                       currentUserRole={UserRole.TATTOO_ARTIST}
                       onConfirm={handleConfirm}
                       onCancel={handleCancel}
@@ -115,43 +152,12 @@ export default function ArtistDashboardPage() {
               </div>
             )}
 
-            {/* Confirmed */}
-            {!loading && confirmed.length > 0 && (
-              <div className={styles.section}>
-                <h2 className={styles.sectionTitle}>
-                  <span className={styles.confirmedDot} /> Confirmadas
-                </h2>
-                <div className={styles.appointmentsList}>
-                  {confirmed.map((appointment) => (
-                    <AppointmentCard
-                      key={appointment.id}
-                      appointment={appointment}
-                      showActions
-                      currentUserRole={UserRole.TATTOO_ARTIST}
-                      onCancel={handleCancel}
-                    />
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Cancelled */}
-            {!loading && cancelled.length > 0 && (
-              <div className={styles.section}>
-                <h2 className={styles.sectionTitle}>
-                  <span className={styles.cancelledDot} /> Canceladas
-                </h2>
-                <div className={styles.appointmentsList}>
-                  {cancelled.map((appointment) => (
-                    <AppointmentCard
-                      key={appointment.id}
-                      appointment={appointment}
-                      showActions={false}
-                      currentUserRole={UserRole.TATTOO_ARTIST}
-                    />
-                  ))}
-                </div>
-              </div>
+            {/* Empty state for filtered tab */}
+            {!loading && !error && appointments.length > 0 && filteredAppointments.length === 0 && (
+              <EmptyState
+                message="No hay citas en este estado."
+                icon={<span className={styles.emptyIcon}>🔍</span>}
+              />
             )}
           </div>
         </div>

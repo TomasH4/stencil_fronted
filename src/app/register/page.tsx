@@ -21,7 +21,7 @@ const registerSchema = z.object({
     .string()
     .min(6, 'La contraseña debe tener al menos 6 caracteres'),
   role: z.nativeEnum(UserRole, {
-    errorMap: () => ({ message: 'Selecciona un rol' }),
+    message: 'Selecciona un rol',
   }),
 });
 

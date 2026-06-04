@@ -86,15 +86,24 @@ export const useArtistProfile = () => {
     setLoading(true);
     setError(null);
     try {
-      const data = await artistService.addPortfolioImage(artistId, formData);
-      setProfile(prev => prev ? { 
-        ...prev, 
-        portfolioImages: [...(prev.portfolioImages || []), data] 
-      } : null);
-      return data;
-    } catch (err: unknown) {
-      const error = err as { response?: { data?: { error?: { message?: string }, message?: string } }; message?: string };
-      setError(error.response?.data?.error?.message || error.response?.data?.message || error.message || 'Error adding image');
+      const data = await artistService.uploadPortfolioImage(artistId, formData);
+      setProfile(data);
+    } catch (err: any) {
+      setError(err.response?.data?.error?.message || 'Error al subir imagen al portafolio');
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const uploadAvatar = useCallback(async (artistId: string, formData: FormData) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await artistService.uploadAvatar(artistId, formData);
+      setProfile(data);
+    } catch (err: any) {
+      setError(err.response?.data?.error?.message || 'Error al subir el avatar');
       throw err;
     } finally {
       setLoading(false);
@@ -106,18 +115,20 @@ export const useArtistProfile = () => {
     setError(null);
     try {
       await artistService.removePortfolioImage(artistId, imageId);
-      setProfile(prev => prev ? { 
-        ...prev, 
-        portfolioImages: (prev.portfolioImages || []).filter(img => img.id !== imageId) 
-      } : null);
-    } catch (err: unknown) {
-      const error = err as { response?: { data?: { error?: { message?: string }, message?: string } }; message?: string };
-      setError(error.response?.data?.error?.message || error.response?.data?.message || error.message || 'Error removing image');
+      setProfile((prev) => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          portfolioImages: prev.portfolioImages?.filter((img) => img.id !== imageId) || []
+        };
+      });
+    } catch (err: any) {
+      setError(err.response?.data?.error?.message || 'Error al eliminar imagen del portafolio');
       throw err;
     } finally {
       setLoading(false);
     }
   }, []);
 
-  return { profile, loading, error, fetchProfile, fetchMyProfile, createProfile, updateProfile, deleteProfile, addPortfolioImage, removePortfolioImage };
+  return { profile, loading, error, fetchProfile, fetchMyProfile, createProfile, updateProfile, deleteProfile, addPortfolioImage, removePortfolioImage, uploadAvatar };
 };

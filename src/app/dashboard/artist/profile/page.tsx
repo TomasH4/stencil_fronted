@@ -14,7 +14,7 @@ import styles from './page.module.css';
 
 export default function ArtistProfilePage() {
   const { user } = useAuthContext();
-  const { profile, loading, error, fetchMyProfile, createProfile, updateProfile, addPortfolioImage, removePortfolioImage } = useArtistProfile();
+  const { profile, loading, error, fetchMyProfile, createProfile, updateProfile, addPortfolioImage, removePortfolioImage, uploadAvatar } = useArtistProfile();
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
   const [formError, setFormError] = useState<string | null>(null);
 
@@ -66,6 +66,21 @@ export default function ArtistProfilePage() {
     } catch (err: unknown) {
       const e = err as { response?: { data?: { message?: string } }; message?: string };
       setFormError(e.response?.data?.message || e.message || 'Error al subir la imagen');
+    }
+  };
+
+  const handleUploadAvatar = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!profile || !e.target.files || !e.target.files[0]) return;
+
+    try {
+      const formData = new FormData();
+      formData.append('avatar', e.target.files[0]);
+      await uploadAvatar(profile.id, formData);
+      setSuccessMsg('Foto de perfil actualizada');
+      setTimeout(() => setSuccessMsg(null), 4000);
+    } catch (err: unknown) {
+      const e = err as { response?: { data?: { message?: string } }; message?: string };
+      setFormError(e.response?.data?.message || e.message || 'Error al actualizar foto');
     }
   };
 
@@ -138,6 +153,21 @@ export default function ArtistProfilePage() {
             {!loading && profile && (
               <div className={styles.previewCard}>
                 <h2 className={styles.previewTitle}>Vista previa de tu perfil</h2>
+                {profile.profilePictureUrl && (
+                  <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1rem' }}>
+                    <img 
+                      src={profile.profilePictureUrl} 
+                      alt="Avatar" 
+                      style={{ width: '100px', height: '100px', borderRadius: '50%', objectFit: 'cover' }} 
+                    />
+                  </div>
+                )}
+                <div style={{ marginBottom: '1rem', textAlign: 'center' }}>
+                  <label style={{ cursor: 'pointer', color: 'var(--color-accent)', textDecoration: 'underline' }}>
+                    Cambiar foto de perfil
+                    <input type="file" accept="image/*" style={{ display: 'none' }} onChange={handleUploadAvatar} />
+                  </label>
+                </div>
                 <div className={styles.previewGrid}>
                   <div className={styles.previewItem}>
                     <span className={styles.previewLabel}>Estilo</span>

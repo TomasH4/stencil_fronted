@@ -8,9 +8,10 @@ import styles from './ArtistFilters.module.css';
 
 interface ArtistFiltersProps {
   onFilter: (params: GetArtistsParams) => void;
+  isLoading?: boolean;
 }
 
-export default function ArtistFilters({ onFilter }: ArtistFiltersProps) {
+export default function ArtistFilters({ onFilter, isLoading }: ArtistFiltersProps) {
   const { register, handleSubmit, reset } = useForm<GetArtistsParams>();
 
   const onSubmit = (data: GetArtistsParams) => {
@@ -64,7 +65,7 @@ export default function ArtistFilters({ onFilter }: ArtistFiltersProps) {
       </div>
 
       <div className={styles.actions}>
-        <Button type="submit">Buscar</Button>
+        <Button type="submit" isLoading={isLoading}>Buscar</Button>
         <Button type="button" variant="secondary" onClick={handleClear}>
           Limpiar
         </Button>

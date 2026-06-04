@@ -18,7 +18,8 @@ interface ReviewFormProps {
 
 export default function ReviewForm({ artistProfileId, onSubmit }: ReviewFormProps) {
   const { register, handleSubmit, formState: { errors, isSubmitting }, reset } = useForm<{ rating: number; comment: string }>({
-    resolver: zodResolver(reviewSchema),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    resolver: zodResolver(reviewSchema) as any,
     defaultValues: {
       rating: 5,
       comment: ''

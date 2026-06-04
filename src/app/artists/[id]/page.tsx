@@ -7,6 +7,7 @@ import { useAuthContext } from '@/context/AuthContext';
 import { useArtistProfile } from '@/hooks/useArtistProfile';
 import { useReviews } from '@/hooks/useReviews';
 import { useAppointments } from '@/hooks/useAppointments';
+import { useFavorites } from '@/hooks/useFavorites';
 import { UserRole } from '@/types/auth.types';
 import { CreateReviewDto } from '@/types/review.types';
 import { CreateAppointmentDto } from '@/types/appointment.types';
@@ -25,6 +26,7 @@ export default function ArtistDetailPage() {
   const { profile, loading: profileLoading, error: profileError, fetchProfile } = useArtistProfile();
   const { reviews, loading: reviewsLoading, error: reviewsError, fetchReviews, submitReview } = useReviews();
   const { createAppointment, loading: apptLoading, error: apptError } = useAppointments();
+  const { favorites, fetchFavorites, toggleFavorite } = useFavorites();
   const [showAppointmentForm, setShowAppointmentForm] = useState(false);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
@@ -32,9 +34,12 @@ export default function ArtistDetailPage() {
     if (id) {
       fetchProfile(id);
       fetchReviews(id);
+      if (user?.role === UserRole.CLIENT) {
+        fetchFavorites();
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id]);
+  }, [id, user?.role]);
 
   const handleSubmitReview = async (dto: CreateReviewDto) => {
     try {
@@ -57,7 +62,17 @@ export default function ArtistDetailPage() {
     }
   };
 
+  const handleToggleFavorite = async () => {
+    try {
+      await toggleFavorite(id);
+      await fetchFavorites();
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   const isClient = user?.role === UserRole.CLIENT;
+  const isFav = favorites.some((f) => f.id === id);
 
   if (profileLoading) {
     return (
@@ -86,14 +101,32 @@ export default function ArtistDetailPage() {
           {/* Artist Profile Header */}
           <div className={styles.profileHeader}>
             <div className={styles.avatarWrapper}>
-              <div className={styles.avatar}>
-                {(profile.name?.[0] || profile.user?.email?.[0] || 'A').toUpperCase()}
-              </div>
+              {profile.profilePictureUrl ? (
+                <img 
+                  src={profile.profilePictureUrl} 
+                  alt={profile.name || 'Avatar'} 
+                  style={{ width: '100px', height: '100px', borderRadius: '50%', objectFit: 'cover' }} 
+                />
+              ) : (
+                <div className={styles.avatar}>
+                  {(profile.name?.[0] || profile.user?.email?.[0] || 'A').toUpperCase()}
+                </div>
+              )}
             </div>
             <div className={styles.profileInfo}>
-              <h1 className={styles.artistName}>
-                {profile.name || profile.user?.email || `Tatuador #${profile.id.slice(0, 8)}`}
-              </h1>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                <h1 className={styles.artistName}>
+                  {profile.name || profile.user?.email || `Tatuador #${profile.id.slice(0, 8)}`}
+                </h1>
+                {isClient && (
+                  <button 
+                    onClick={handleToggleFavorite}
+                    style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.5rem', color: isFav ? 'red' : 'var(--color-text-secondary)' }}
+                  >
+                    {isFav ? '❤️' : '🤍'}
+                  </button>
+                )}
+              </div>
               <div className={styles.tagRow}>
                 <span className={styles.styleTag}>{profile.style}</span>
                 <span className={styles.locationTag}>📍 {profile.location}</span>
@@ -101,6 +134,29 @@ export default function ArtistDetailPage() {
               <p className={styles.priceRange}>
                 💰 ${profile.priceMin.toLocaleString()} – ${profile.priceMax.toLocaleString()}
               </p>
+              
+              <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
+                {profile.whatsappNumber && (
+                  <a 
+                    href={`https://wa.me/${profile.whatsappNumber.replace(/[^0-9]/g, '')}`} 
+                    target="_blank" 
+                    rel="noreferrer"
+                    style={{ textDecoration: 'none', color: '#25D366', fontWeight: 'bold' }}
+                  >
+                    📱 WhatsApp
+                  </a>
+                )}
+                {profile.instagramUrl && (
+                  <a 
+                    href={profile.instagramUrl} 
+                    target="_blank" 
+                    rel="noreferrer"
+                    style={{ textDecoration: 'none', color: '#E1306C', fontWeight: 'bold' }}
+                  >
+                    📸 Instagram
+                  </a>
+                )}
+              </div>
             </div>
 
             {isClient && (
@@ -180,6 +236,7 @@ export default function ArtistDetailPage() {
               <h2 className={styles.sectionTitle}>Agendar una cita</h2>
               <ErrorMessage message={apptError} />
               <AppointmentForm
+                artistProfileId={id}
                 onSubmit={handleCreateAppointment}
                 isLoading={apptLoading}
               />
@@ -216,7 +273,7 @@ export default function ArtistDetailPage() {
               {isClient && (
                 <div className={styles.reviewFormWrapper}>
                   <h3 className={styles.subSectionTitle}>Deja tu reseña</h3>
-                  <ReviewForm onSubmit={handleSubmitReview} />
+                  <ReviewForm artistProfileId={id} onSubmit={handleSubmitReview} />
                 </div>
               )}
             </div>

@@ -15,10 +15,23 @@ const profileSchema = z.object({
   location: z.string().min(3, 'La ubicación es requerida'),
   priceMin: z.coerce.number().min(0, 'Precio mínimo no válido'),
   priceMax: z.coerce.number().min(0, 'Precio máximo no válido'),
-}).refine(data => data.priceMin <= data.priceMax, {
+  whatsappNumber: z.string().optional(),
+  instagramUrl: z.string().url('URL de Instagram inválida').optional().or(z.literal('')),
+}).refine(data => (Number(data.priceMin) <= Number(data.priceMax)), {
   message: "El precio mínimo no puede ser mayor al máximo",
   path: ["priceMax"],
 });
+
+type ProfileFormValues = {
+  name?: string;
+  bio: string;
+  style: string;
+  location: string;
+  priceMin: number;
+  priceMax: number;
+  whatsappNumber?: string;
+  instagramUrl?: string;
+};
 
 interface ArtistProfileFormProps {
   /** If provided, pre-fills the form with existing profile data */
@@ -39,8 +52,10 @@ const STYLE_OPTIONS = [
 ];
 
 export default function ArtistProfileForm({ initialData, onSubmit, isLoading }: ArtistProfileFormProps) {
-  const { register, handleSubmit, formState: { errors } } = useForm<CreateArtistProfileDto>({
-    resolver: zodResolver(profileSchema),
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { register, handleSubmit, formState: { errors } } = useForm<ProfileFormValues>({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    resolver: zodResolver(profileSchema) as any,
     defaultValues: {
       name: initialData?.name ?? '',
       bio: initialData?.bio ?? '',
@@ -48,11 +63,13 @@ export default function ArtistProfileForm({ initialData, onSubmit, isLoading }: 
       location: initialData?.location ?? '',
       priceMin: initialData?.priceMin ?? 0,
       priceMax: initialData?.priceMax ?? 0,
+      whatsappNumber: initialData?.whatsappNumber ?? '',
+      instagramUrl: initialData?.instagramUrl ?? '',
     }
   });
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
+    <form onSubmit={handleSubmit((data) => onSubmit(data as unknown as CreateArtistProfileDto))} className={styles.form}>
       <Input
         id="name"
         label="Nombre Artístico"
@@ -105,6 +122,23 @@ export default function ArtistProfileForm({ initialData, onSubmit, isLoading }: 
           placeholder="0"
           error={errors.priceMax?.message}
           {...register('priceMax')}
+        />
+      </div>
+
+      <div className={styles.contactRow}>
+        <Input
+          id="whatsappNumber"
+          label="Número de WhatsApp"
+          placeholder="ej. +573001234567"
+          error={errors.whatsappNumber?.message}
+          {...register('whatsappNumber')}
+        />
+        <Input
+          id="instagramUrl"
+          label="Perfil de Instagram"
+          placeholder="https://instagram.com/tu_perfil"
+          error={errors.instagramUrl?.message}
+          {...register('instagramUrl')}
         />
       </div>
 

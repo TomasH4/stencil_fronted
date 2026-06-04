@@ -5,7 +5,7 @@ import {
   UpdateArtistProfileDto, 
   GetArtistsParams 
 } from '../types/artist.types';
-import { PaginatedResponse } from '../types/api.types';
+import { PaginatedResponse, ApiResponse } from '../types/api.types';
 
 export const artistService = {
   getArtists: async (params?: GetArtistsParams): Promise<PaginatedResponse<TattooArtistProfile>> => {
@@ -29,7 +29,7 @@ export const artistService = {
   },
 
   updateProfile: async (id: string, dto: UpdateArtistProfileDto): Promise<TattooArtistProfile> => {
-    const { data } = await api.put<{data: TattooArtistProfile}>(`/artists/${id}`, dto);
+    const { data } = await api.put<ApiResponse<TattooArtistProfile>>(`/artists/${id}`, dto);
     return data.data;
   },
 
@@ -37,8 +37,17 @@ export const artistService = {
     await api.delete(`/artists/${id}`);
   },
 
-  addPortfolioImage: async (artistId: string, formData: FormData): Promise<any> => {
-    const { data } = await api.post(`/artists/${artistId}/portfolio`, formData, {
+  uploadPortfolioImage: async (id: string, formData: FormData): Promise<TattooArtistProfile> => {
+    const { data } = await api.post<ApiResponse<TattooArtistProfile>>(`/artists/${id}/portfolio`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return data.data;
+  },
+
+  uploadAvatar: async (id: string, formData: FormData): Promise<TattooArtistProfile> => {
+    const { data } = await api.post<ApiResponse<TattooArtistProfile>>(`/artists/${id}/avatar`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
