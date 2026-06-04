@@ -1,36 +1,43 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Stencil - Frontend
 
-## Getting Started
+Este es el frontend de **Stencil**, una plataforma web diseñada para conectar clientes con tatuadores (Tattoo Artists). La aplicación permite a los usuarios buscar artistas, ver su portafolio, dejar reseñas y agendar citas.
 
-First, run the development server:
+El proyecto está construido utilizando **Next.js** (App Router), React y TypeScript, con un enfoque en componentes modulares y una experiencia de usuario rápida y dinámica.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## Requisitos Previos
+
+- [Node.js](https://nodejs.org/es/) (versión 18 o superior)
+- npm o yarn
+
+## Variables de Entorno
+
+Para que la aplicación pueda conectarse con el backend, necesitas configurar las variables de entorno. 
+Crea un archivo llamado `.env.local` en la raíz de la carpeta `frontend` y añade la siguiente variable:
+
+```env
+# URL base de la API del backend
+NEXT_PUBLIC_API_URL=http://localhost:3000/api/v1
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+*(Si ya tienes el backend desplegado, reemplaza `http://localhost:3000/api/v1` por tu URL de producción, por ejemplo `https://tu-backend.up.railway.app/api/v1`)*.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Setup y Ejecución Local
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. Instala las dependencias:
+   ```bash
+   npm install
+   ```
 
-## Learn More
+2. Inicia el servidor de desarrollo:
+   ```bash
+   npm run dev
+   ```
 
-To learn more about Next.js, take a look at the following resources:
+3. Abre [http://localhost:3000](http://localhost:3000) en tu navegador para ver la aplicación.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Comandos Útiles
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- `npm run dev`: Inicia el servidor en modo desarrollo.
+- `npm run build`: Compila la aplicación para producción.
+- `npm run start`: Inicia el servidor en modo producción (requiere compilar primero).
+- `npm run lint`: Ejecuta el linter (ESLint) para encontrar problemas en el código.
